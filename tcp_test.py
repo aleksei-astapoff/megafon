@@ -8,9 +8,8 @@ from sqlalchemy import Column, DateTime, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 
-logging.basicConfig(level=logging.INFO)
-
-stop_server = False
+HOST_PORT = ('127.0.0.1', 8080)
+STOP_SERVER = False
 
 
 class Base(DeclarativeBase):
@@ -77,12 +76,12 @@ async def handle_client(reader, writer):
 async def run_server():
     """Сопрограмма запуска TCP-сервера"""
 
-    global stop_server
+    global STOP_SERVER
 
-    server = await asyncio.start_server(handle_client, '127.0.0.1', 8080)
+    server = await asyncio.start_server(handle_client, *HOST_PORT)
     logging.info('Сервер запущен на 127.0.0.1:8080')
     async with server:
-        while not stop_server:
+        while not STOP_SERVER:
             await asyncio.sleep(1)
 
     logging.info('Сервер остановлен')
@@ -91,9 +90,9 @@ async def run_server():
 async def tcp_client(id):
     """Сопрограмма запуска TCP-клиентов"""
 
-    reader, writer = await asyncio.open_connection('127.0.0.1', 8080)
+    reader, writer = await asyncio.open_connection(*HOST_PORT)
 
-    for i in range(5):
+    for i in range(1, 6):
         message = f'Сообщение {i}, клиент {id}'
         writer.write(message.encode())
         await writer.drain()
@@ -110,21 +109,24 @@ async def tcp_client(id):
 async def main():
     """Основная программа"""
 
-    global stop_server
+    global STOP_SERVER
 
     server_task = asyncio.create_task(run_server())
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(2)  # Ожидание запуска TCP-сервера
 
-    client_tasks = [asyncio.create_task(tcp_client(i)) for i in range(10)]
+    client_tasks = [asyncio.create_task(tcp_client(i)) for i in range(1, 11)]
 
     await asyncio.gather(*client_tasks)
 
-    stop_server = True
+    STOP_SERVER = True
 
     await server_task
 
+
 if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO)
 
     # Запуск основной программы
     asyncio.run(main())
