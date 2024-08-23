@@ -41,9 +41,9 @@ git clone https://github.com/aleksei-astapoff/megafon.git
 3. #### Создайте и активируйте виртуальное окружение:
 Команда для установки виртуального окружения на Mac или Linux:
 ```
-python3 -m venv env
+python3 -m venv venv
 
-source env/bin/activate
+source venv/bin/activate
 ```
 
 Команда для установки виртуального окружения на Windows:
