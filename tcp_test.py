@@ -84,7 +84,7 @@ async def run_server():
         while not STOP_SERVER:
             await asyncio.sleep(1)
 
-    logging.info('Сервер остановлен')
+    logging.info('Сервер остановлен.')
 
 
 async def tcp_client(id):
